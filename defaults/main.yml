@@ -1,0 +1,6 @@
+---
+_mongos_package_default:
+  default:
+    - mongos
+
+mongos_state: present
