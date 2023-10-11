@@ -1,9 +1,6 @@
 ---
-- name: Converge
-
-  hosts: all
-
+- name: Deploy mongos
+  hosts: mongos
+  become: true
   roles:
-
-    - nephelaiio.plugins
     - nephelaiio.mongos

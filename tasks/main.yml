@@ -1,19 +1,37 @@
 ---
-- name: Include variable overrides
-  ansible.builtin.set_fact:
-    _mongos_package: "{{ mongos_package | default(_mongos_package_default | sorted_get(overrides)) }}"
-  vars:
-    overrides:
-      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_release | lower }}"
-      - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version }}"
-      - "{{ ansible_distribution | lower }}"
-      - "{{ ansible_os_family | lower }}"
-      - "default"
-  tags:
-    - always
-
-- name: Install mongos package
+- name: Install packages
   ansible.builtin.package:
-    name: "{{ _mongos_package }}"
-    state: "{{ mongos_state }}"
-  become: yes
+    name: "{{ mongos_package_name }}"
+    state: "{{ mongos_package_state }}"
+
+- name: Query systemd service location
+  ansible.builtin.command:
+    cmd: pkg-config systemd --variable=systemdsystemunitdir
+  register: _systemd_query
+
+- name: Record system service location
+  ansible.builtin.set_fact:
+    mongos_systemd_unit_location: "{{ _systemd.query.stdout }}"
+
+- name: Record mongos binary location
+  ansible.builtin.command:
+    cmd: which mongos
+  register: _mongos_query
+
+- name: Install mongos service unit
+  ansible.builtin.include_role:
+    name: 0x0i.systemd
+  vars:
+    unit_config:
+      - name: "{{ mongos_service_name }}"
+        Unit:
+          After: network-online.target
+          Wants: network-online.target
+          Requires: my-service.socket
+        Service:
+          User: 'web'
+          Group: 'web'
+          ExecStart: '/usr/local/bin/my_service $ARGS'
+          ExecReload: '/bin/kill -s HUP $MAINPID'
+        Install:
+          WantedBy: 'multi-user.target'

@@ -1,6 +1,8 @@
 ---
-_mongos_package_default:
-  default:
-    - mongos
-
-mongos_state: present
+mongos_package_name:
+  - mongodb-org-mongos
+  - pkg-config
+mongos_package_state: present
+mongos_service_name: mongos
+mongos_service_state: started
+mongos_service_enabled: "{{ mongos_service_state != 'stopped' }}"
