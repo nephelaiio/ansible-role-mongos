@@ -2,6 +2,7 @@
 roles:
   - name: nephelaiio.plugins
   - name: nephelaiio.mongodb_repo
+  - name: 0x0i.systemd
   - src: https://github.com/wpnops/ansible-role-mongodb.git
     name: wpninfra.mongodb
     version: master

@@ -4,5 +4,13 @@ mongos_package_name:
   - pkg-config
 mongos_package_state: present
 mongos_service_name: mongos
+mongos_service_port: 27017
 mongos_service_state: started
 mongos_service_enabled: "{{ mongos_service_state != 'stopped' }}"
+mongos_config_file: /etc/mongos.yaml
+mongos_storage_path: /var/lib/mongodb
+mongos_replicaset_config_name: config
+mongos_replicaset_config_port: 27017
+mongos_replicaset_config_members: []
+mongos_user: mongodb
+mongos_group: mongodb

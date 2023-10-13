@@ -1,7 +1,6 @@
 ---
-- name: Update package repositories
-  hosts: all
-  gather_facts: true
+- name: Deploy mongodb config cluster
+  hosts: config
   become: true
   tasks:
     - name: Update apt package cache
@@ -10,11 +9,6 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
 
-
-- name: Deploy mongodb config cluster
-  hosts: config
-  become: true
-  tasks:
     - name: Deploy mongodb
       ansible.builtin.include_role:
         name: wpninfra.mongodb
@@ -22,12 +16,19 @@
         mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
         mongodb_members: "{{ mongodb_addresses | list }}"
         mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
+        mongodb_shell: mongosh
 
 
 - name: Deploy mongodb shard cluster
   hosts: shard
   become: true
   tasks:
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+
     - name: Deploy mongodb
       ansible.builtin.include_role:
         name: wpninfra.mongodb
@@ -35,3 +36,4 @@
         mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
         mongodb_members: "{{ mongodb_addresses | list }}"
         mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
+        mongodb_shell: mongosh

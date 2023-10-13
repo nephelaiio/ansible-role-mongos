@@ -11,12 +11,26 @@
 
 - name: Record system service location
   ansible.builtin.set_fact:
-    mongos_systemd_unit_location: "{{ _systemd.query.stdout }}"
+    mongos_systemd_unit_location: "{{ _systemd_query.stdout }}"
 
 - name: Record mongos binary location
   ansible.builtin.command:
     cmd: which mongos
   register: _mongos_query
+
+- name: Manage mongos configuration
+  ansible.builtin.template:
+    dest: "{{ mongos_config_file }}"
+    src: mongos.j2.yaml
+    owner: "{{ mongos_user }}"
+    group: "{{ mongos_group }}"
+    mode: 0644
+  vars:
+    _port: "{{ mongos_service_port }}"
+    _replset_config_name: "{{ mongos_replicaset_config_name }}"
+    _format: "%s:{{ mongos_replicaset_config_port }}"
+    _members: "{{ mongos_replicaset_config_members | map('map_format, _format') }}"
+    _replset_config_members: "{{ _members | join(',') }}"
 
 - name: Install mongos service unit
   ansible.builtin.include_role:
@@ -27,11 +41,18 @@
         Unit:
           After: network-online.target
           Wants: network-online.target
-          Requires: my-service.socket
         Service:
-          User: 'web'
-          Group: 'web'
-          ExecStart: '/usr/local/bin/my_service $ARGS'
-          ExecReload: '/bin/kill -s HUP $MAINPID'
+          User: "{{ mongos_user }}"
+          Group: "{{ mongos_group }}"
+          ExecStart: "{{ _mongos_query.stdout }} --config {{ mongos_config_file }}"
+          RuntimeDirectory: mongodb
+          LimitFSIZE: infinity
+          LimitCPU: infinity
+          LimitAS: infinity
+          LimitNOFILE: 64000
+          LimitNPROC: 64000
+          LimitMEMLOCK: infinity
+          TasksMax: infinity
+          TasksAccounting: false
         Install:
-          WantedBy: 'multi-user.target'
+          WantedBy: multi-user.target

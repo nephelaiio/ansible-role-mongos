@@ -2,5 +2,13 @@
 - name: Deploy mongos
   hosts: mongos
   become: true
-  roles:
-    - nephelaiio.mongos
+  pre_tasks:
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+      changed_when: false
+
+    - name: Deploy mongos
+      ansible.builtin.include_role:
+        name: nephelaiio.mongos
