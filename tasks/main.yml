@@ -18,6 +18,11 @@
     cmd: which mongos
   register: _mongos_query
 
+- name: Verify configuration cluster configuration
+  ansible.builtin.fail:
+    msg: "Configuration cluster member set cannot be empty"
+  when: mongos_replicaset_config_members | length == 0
+
 - name: Manage mongos configuration
   ansible.builtin.template:
     dest: "{{ mongos_config_file }}"
