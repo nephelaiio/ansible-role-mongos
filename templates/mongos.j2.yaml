@@ -2,10 +2,6 @@
 sharding:
   configDB: "{{ _replset_config_name }}/{{ _replset_config_members }}"
 
-net:
-  port: {{ _port }}
-  bindIp: 0.0.0.0
-
 processManagement:
   fork: false
 
