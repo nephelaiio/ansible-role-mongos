@@ -4,8 +4,7 @@ sharding:
 
 net:
   port: {{ _port }}
-  bindIpAll: true
-  ipv6: false
+  bindIp: 0.0.0.0
 
 processManagement:
   fork: false

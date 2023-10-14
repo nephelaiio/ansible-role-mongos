@@ -22,8 +22,6 @@
   ansible.builtin.template:
     dest: "{{ mongos_config_file }}"
     src: mongos.j2.yaml
-    owner: "{{ mongos_user }}"
-    group: "{{ mongos_group }}"
     mode: 0644
   vars:
     _port: "{{ mongos_service_port }}"
