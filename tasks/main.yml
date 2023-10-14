@@ -34,6 +34,8 @@
   ansible.builtin.include_role:
     name: 0x0i.systemd
   vars:
+    _port: "{{ mongos_service_port }}"
+    _execArgs: "--port {{ _port }} --bind_ip 0.0.0.0 --config {{ mongos_config_file }}"
     unit_config:
       - name: "{{ mongos_service_name }}"
         Unit:
@@ -42,7 +44,7 @@
         Service:
           User: "{{ mongos_user }}"
           Group: "{{ mongos_group }}"
-          ExecStart: "{{ _mongos_query.stdout }} --config {{ mongos_config_file }}"
+          ExecStart: "{{ _mongos_query.stdout }} {{ _execArgs }}"
           RuntimeDirectory: mongodb
           LimitFSIZE: infinity
           LimitCPU: infinity
@@ -54,3 +56,9 @@
           TasksAccounting: false
         Install:
           WantedBy: multi-user.target
+
+- name: Manage mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: "{{ mongos_service_state }}"
+    enabled: "{{ mongos_service_state != 'stopped' | bool }}"
