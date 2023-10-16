@@ -8,6 +8,7 @@
   ansible.builtin.command:
     cmd: pkg-config systemd --variable=systemdsystemunitdir
   register: _systemd_query
+  tags: skip_ansible_lint
 
 - name: Record system service location
   ansible.builtin.set_fact:
@@ -16,6 +17,7 @@
 - name: Record mongos binary location
   ansible.builtin.command:
     cmd: which mongos
+  tags: skip_ansible_lint
   register: _mongos_query
 
 - name: Verify configuration cluster configuration
@@ -39,8 +41,7 @@
   ansible.builtin.include_role:
     name: 0x0i.systemd
   vars:
-    _port: "{{ mongos_service_port }}"
-    _execArgs: "--config {{ mongos_config_file }}"
+    systemd_exec_args: "--config {{ mongos_config_file }}"
     unit_config:
       - name: "{{ mongos_service_name }}"
         Unit:
@@ -49,7 +50,7 @@
         Service:
           User: "{{ mongos_user }}"
           Group: "{{ mongos_group }}"
-          ExecStart: "{{ _mongos_query.stdout }} {{ _execArgs }}"
+          ExecStart: "{{ _mongos_query.stdout }} {{ systemd_exec_args }}"
           Type: simple
           RuntimeDirectory: mongodb
           LimitFSIZE: infinity
@@ -62,6 +63,7 @@
           TasksAccounting: false
         Install:
           WantedBy: multi-user.target
+  tags: skip_ansible_lint
 
 - name: Manage mongos service
   ansible.builtin.service:

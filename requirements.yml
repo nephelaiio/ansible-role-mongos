@@ -8,5 +8,5 @@ roles:
     version: master
     scm: git
 collections:
- - community.general
- - community.mongodb
+  - community.general
+  - community.mongodb
