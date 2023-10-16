@@ -20,7 +20,7 @@
   tags: skip_ansible_lint
   register: _mongos_query
 
-- name: Verify configuration cluster configuration
+- name: Verify configuration cluster members
   ansible.builtin.fail:
     msg: "Configuration cluster member set cannot be empty"
   when: mongos_replicaset_config_members | length == 0
@@ -36,6 +36,7 @@
     _format: "%s:{{ mongos_replicaset_config_port }}"
     _members: "{{ mongos_replicaset_config_members | map('map_format', _format) }}"
     _replset_config_members: "{{ _members | join(',') }}"
+  register: mongos_config
 
 - name: Install mongos service unit
   ansible.builtin.include_role:
@@ -70,3 +71,9 @@
     name: "{{ mongos_service_name }}"
     state: "{{ mongos_service_state }}"
     enabled: "{{ mongos_service_state != 'stopped' | bool }}"
+
+- name: Restart mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: restarted
+  when: mongos_config is changed

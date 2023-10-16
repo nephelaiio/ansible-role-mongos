@@ -117,6 +117,7 @@ provisioner:
     hosts:
       all:
         vars:
+          mongos_service_name: mongos
           mongos_replicaset_config_name: config
           mongos_replicaset_shard_name: shard
           mongodb_shell: mongosh

@@ -1,10 +1,102 @@
 ---
-- name: Verify
-
-  hosts: all
-
-  gather_facts: true
-
+- name: Verify config cluster
+  hosts: config
   become: true
-
+  roles:
+    - nephelaiio.plugins
   tasks:
+
+    - name: Retrieve MongoDB replicaset status
+      community.mongodb.mongodb_status:
+        replica_set: "{{ mongos_replicaset_config_name }}"
+        validate: minimal
+        poll: 5
+        interval: 10
+      register: mongodb_rs
+      run_once: true
+
+    - name: Debug MongoDB replica status
+      ansible.builtin.debug:
+        msg: "{{ mongodb_rs }}"
+      run_once: true
+
+
+- name: Verify shard cluster
+  hosts: shard
+  become: true
+  roles:
+    - nephelaiio.plugins
+  tasks:
+
+    - name: Retrieve MongoDB replicaset status
+      community.mongodb.mongodb_status:
+        replica_set: "{{ mongos_replicaset_shard_name }}"
+        validate: minimal
+        poll: 5
+        interval: 10
+      register: mongodb_rs
+      run_once: true
+
+    - name: Debug MongoDB replica status
+      ansible.builtin.debug:
+        msg: "{{ mongodb_rs }}"
+      run_once: true
+
+
+- name: Verify mongos deployment
+  hosts: mongos
+  become: true
+  roles:
+    - nephelaiio.plugins
+  tasks:
+
+    - name: Check service state
+      ansible.builtin.command: "systemctl status {{ mongos_service_name }}"
+
+    - name: Register and verify shard cluster
+      run_once: true
+      block:
+
+        - name: Register shard cluster
+          ansible.builtin.set_fact:
+            mongos_shard_cluster: "{{ _shard }}"
+          vars:
+            _attrs: ['ansible_default_ipv4', 'address']
+            _hosts: "{{ groups['shard'] | map('extract', hostvars, _attrs) }}"
+            _port: '27017'
+            _members: "{{ _hosts | map('map_format', '%s:' + _port) }}"
+            _shard: "{{ mongos_replicaset_shard_name }}/{{ _members | join(',') }}"
+
+        - name: Query registered shards
+          community.mongodb.mongodb_shell:
+            db: "admin"
+            eval: "db.runCommand({listShards: 1})"
+          register: _shard_query
+
+        - name: Register shard cluster
+          community.mongodb.mongodb_shell:
+            db: "admin"
+            eval: "sh.addShard('{{ mongos_shard_cluster }}')"
+          vars:
+            _shard_ids: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list }}"
+          when: mongos_replicaset_config_name not in _shard_ids
+
+        - name: Refresh registered shards
+          community.mongodb.mongodb_shell:
+            db: "admin"
+            eval: "db.runCommand({listShards: 1})"
+          register: _shard_query
+
+        - name: Debug shard list
+          ansible.builtin.debug:
+            msg: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list | join (',') }}"
+
+        - name: Verify shard registration
+          ansible.builtin.fail:
+            msg: "Shard {{ mongos_replicaset_shard_name }} has not been registered"
+          vars:
+            _shard_ids: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list }}"
+            _id_not_found: "{{ mongos_replicaset_shard_name not in _shard_ids }}"
+            _shard: "{{ _shard_query. }}"
+            _host_not_found: "{{  }}"
+          when: _id_not_found
