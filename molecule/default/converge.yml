@@ -1,14 +1,11 @@
 ---
-- name: Deploy mongos
+- name: Gather config host facts
+  hosts: config:shard
+
+- name: Deploy mongodb mongos servers
   hosts: mongos
   become: true
-  pre_tasks:
-    - name: Update apt package cache
-      ansible.builtin.apt:
-        update_cache: yes
-      when: ansible_os_family == 'Debian'
-      changed_when: false
-
-    - name: Deploy mongos
-      ansible.builtin.include_role:
-        name: nephelaiio.mongos
+  roles:
+    - nephelaiio.mongos
+  vars:
+    mongos_replicaset_config_members: "{{ groups['config'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"

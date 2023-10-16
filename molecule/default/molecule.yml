@@ -113,5 +113,12 @@ platforms:
       - shard
 provisioner:
   name: ansible
+  inventory:
+    hosts:
+      all:
+        vars:
+          mongos_replicaset_config_name: config
+          mongos_replicaset_shard_name: shard
+          mongodb_shell: mongosh
 verifier:
   name: ansible

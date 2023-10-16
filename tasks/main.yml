@@ -32,7 +32,7 @@
     _port: "{{ mongos_service_port }}"
     _replset_config_name: "{{ mongos_replicaset_config_name }}"
     _format: "%s:{{ mongos_replicaset_config_port }}"
-    _members: "{{ mongos_replicaset_config_members | map('map_format, _format') }}"
+    _members: "{{ mongos_replicaset_config_members | map('map_format', _format) }}"
     _replset_config_members: "{{ _members | join(',') }}"
 
 - name: Install mongos service unit
@@ -40,7 +40,7 @@
     name: 0x0i.systemd
   vars:
     _port: "{{ mongos_service_port }}"
-    _execArgs: "--port {{ _port }} --bind_ip 0.0.0.0 --config {{ mongos_config_file }}"
+    _execArgs: "--config {{ mongos_config_file }}"
     unit_config:
       - name: "{{ mongos_service_name }}"
         Unit:
@@ -50,6 +50,7 @@
           User: "{{ mongos_user }}"
           Group: "{{ mongos_group }}"
           ExecStart: "{{ _mongos_query.stdout }} {{ _execArgs }}"
+          Type: simple
           RuntimeDirectory: mongodb
           LimitFSIZE: infinity
           LimitCPU: infinity
