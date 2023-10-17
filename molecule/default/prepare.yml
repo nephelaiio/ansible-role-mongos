@@ -2,6 +2,14 @@
 - name: Deploy mongodb config replicaset
   hosts: config
   become: true
+  vars:
+    mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
+    mongodb_members: "{{ mongodb_addresses | list }}"
+    mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
+    mongodb_replicaset_name: "{{ mongos_replicaset_config_name }}"
+    mongodb_sharding_role: configsvr
+  roles:
+    - wpninfra.mongodb
   tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
@@ -9,20 +17,23 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
 
-    - name: Deploy mongodb
-      ansible.builtin.include_role:
-        name: wpninfra.mongodb
-      vars:
-        mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
-        mongodb_members: "{{ mongodb_addresses | list }}"
-        mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
-        mongodb_replicaset_name: "{{ mongos_replicaset_config_name }}"
-        mongodb_sharding_role: configsvr
+    - name: Load required kernel modules into ansible controller
+      community.general.modprobe:
+        name: ip6table_filter
+        state: present
 
 
 - name: Deploy mongodb shard replicaset
   hosts: shard
   become: true
+  vars:
+    mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
+    mongodb_members: "{{ mongodb_addresses | list }}"
+    mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
+    mongodb_replicaset_name: "{{ mongos_replicaset_shard_name }}"
+    mongodb_sharding_role: shardsvr
+  roles:
+    - wpninfra.mongodb
   tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
@@ -30,15 +41,10 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
 
-    - name: Deploy mongodb
-      ansible.builtin.include_role:
-        name: wpninfra.mongodb
-      vars:
-        mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
-        mongodb_members: "{{ mongodb_addresses | list }}"
-        mongodb_replicaset_members: "{{ mongodb_members | map('map_format', '%s:' + mongodb_port) | list }}"
-        mongodb_replicaset_name: "{{ mongos_replicaset_shard_name }}"
-        mongodb_sharding_role: shardsvr
+    - name: Load required kernel modules into ansible controller
+      community.general.modprobe:
+        name: ip6table_filter
+        state: present
 
 - name: Prepare mongos servers
   hosts: mongos
@@ -49,3 +55,8 @@
         update_cache: yes
       when: ansible_os_family == 'Debian'
       changed_when: false
+
+    - name: Load required kernel modules into ansible controller
+      community.general.modprobe:
+        name: ip6table_filter
+        state: present
