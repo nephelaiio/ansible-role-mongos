@@ -10,6 +10,8 @@ mongos_service_port: 27017
 mongos_service_state: started
 mongos_service_enabled: "{{ mongos_service_state != 'stopped' }}"
 mongos_config_file: /etc/mongos.yaml
+mongos_config_verbosity: 2
+mongos_config_bindip: 0.0.0.0
 mongos_storage_path: /var/lib/mongodb
 mongos_replicaset_config_name: config
 mongos_replicaset_config_port: 27017

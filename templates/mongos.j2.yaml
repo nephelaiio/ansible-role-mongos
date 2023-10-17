@@ -4,13 +4,13 @@ sharding:
 
 net:
   port: {{ _port }}
-  bindIpAll: true
+  bindIp: "{{ _bindip }}"
   ipv6: false
 
 processManagement:
   fork: false
 
 systemLog:
-  verbosity: 2
+  verbosity: {{ _verbosity }}
   traceAllExceptions: true
   timeStampFormat: iso8601-utc
