@@ -5,7 +5,6 @@
   roles:
     - nephelaiio.plugins
   tasks:
-
     - name: Retrieve MongoDB replicaset status
       community.mongodb.mongodb_status:
         replica_set: "{{ mongos_replicaset_config_name }}"
@@ -27,7 +26,6 @@
   roles:
     - nephelaiio.plugins
   tasks:
-
     - name: Retrieve MongoDB replicaset status
       community.mongodb.mongodb_status:
         replica_set: "{{ mongos_replicaset_shard_name }}"
@@ -48,8 +46,10 @@
   become: true
   roles:
     - nephelaiio.plugins
+  vars:
+    test_db: test
+    test_collection: data
   tasks:
-
     - name: Check service state
       ansible.builtin.command: "systemctl status {{ mongos_service_name }}"
 
@@ -100,3 +100,97 @@
             _shard: "{{ _shard_query. }}"
             _host_not_found: "{{  }}"
           when: _id_not_found
+
+        - name: Data load and sharding tests
+          tags: data
+          block:
+
+            - name: List databases
+              community.mongodb.mongodb_shell:
+                db: "admin"
+                eval: "db.runCommand({listDatabases: 1})"
+              register: _db_query
+
+            - name: Drop test databases
+              community.mongodb.mongodb_shell:
+                db: "{{ test_db }}"
+                eval: "db.dropDatabase()"
+              vars:
+                _db_names: "{{ _db_query.transformed_output.databases | map(attribute='name') | list }}"
+              when: test_db in _db_names
+
+            - name: Download test data
+              ansible.builtin.uri:
+                url: https://raw.githubusercontent.com/MicrosoftEdge/Demos/main/json-dummy-data/64KB.json
+                return_content: true
+              register: _test_data
+
+            - name: Transform test data
+              ansible.builtin.set_fact:
+                test_json: "{{ _test_json }}"
+                test_size: "{{ _test_json | length }}"
+              vars:
+                _aliases:
+                  id: _id
+                _test_json: "{{ _test_data.content | from_json | map('alias_keys', _aliases) }}"
+
+            - name: Debug test data
+              ansible.builtin.debug:
+                msg: "{{ test_json[0] }}"
+
+            - name: Write test data
+              community.mongodb.mongodb_shell:
+                db: "{{ test_db }}"
+                eval: "db.{{ test_collection }}.insertMany({{ test_json | to_json }})"
+
+            - name: Shard test data
+              community.mongodb.mongodb_shell:
+                db: "{{ test_db }}"
+                eval: |
+                  sh.shardCollection("{{ test_db }}.{{ test_collection }}", { _id: 1 })
+              vars:
+                _collection: "{{ test_db }}.{{ test_collection }}"
+
+            - name: Query test data size
+              community.mongodb.mongodb_shell:
+                db: "{{ test_db }}"
+                eval: "db.{{ test_collection }}.countDocuments()"
+              register: _data_query
+
+            - name: Verify test data size
+              ansible.builtin.fail:
+                msg: "Failed data size check; got {{ _data_size }}, expected {{ test_size }}"
+              vars:
+                _data_size: "{{ _data_query.transformed_output | first }}"
+              when: _data_size != test_size
+
+            - name: Query shard status
+              community.mongodb.mongodb_shell:
+                db: "admin"
+                eval: sh.status()
+              register: _status_query
+
+            - name: Set shard facts
+              ansible.builtin.set_fact:
+                shards_dbs: "{{ _shard_dbs }}"
+                shards_data: "{{ _shard_dbs | selectattr('database._id', 'equalto', test_db) | list  }}"
+              vars:
+                _shard_dbs: "{{ _status_query.transformed_output.value.databases }}"
+
+            - name: Debug shard facts
+              ansible.builtin.debug:
+                msg: "{{ shards_data | first }}"
+
+            - name: Verify shard database info
+              ansible.builtin.fail:
+                msg: "Unable to retrieve shard information for db {{ test_db }}"
+              when: shards_data | length != 1
+
+            - name: Verify shard collection info
+              ansible.builtin.fail:
+                msg: "Unable to retrieve shard information for collection {{ _collection }}"
+              vars:
+                _shard_data: "{{ shards_data | first }}"
+                _collection_data: "{{ _shard_data.collections }}"
+                _collection: "{{ test_db }}.{{ test_collection }}"
+              when: _collection not in _collection_data

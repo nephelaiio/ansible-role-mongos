@@ -38,6 +38,8 @@
     _format: "%s:{{ mongos_replicaset_config_port }}"
     _members: "{{ mongos_replicaset_config_members | map('map_format', _format) }}"
     _replset_config_members: "{{ _members | join(',') }}"
+    _verbosity: "{{ mongos_config_verbosity }}"
+    _bindip: "{{ mongos_config_bindip }}"
   register: mongos_config
   notify: daemon_restart
 
