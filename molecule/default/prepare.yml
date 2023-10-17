@@ -1,4 +1,13 @@
 ---
+- name: Prepare
+  hosts: localhost
+  become: true
+  tasks:
+    - name: Load required kernel modules into ansible controller
+      community.general.modprobe:
+        name: ip6table_filter
+        state: present
+
 - name: Deploy mongodb config replicaset
   hosts: config
   become: true
@@ -16,11 +25,6 @@
         update_cache: yes
       when: ansible_os_family == 'Debian'
       changed_when: false
-
-    - name: Load required kernel modules into ansible controller
-      community.general.modprobe:
-        name: ip6table_filter
-        state: present
 
 
 - name: Deploy mongodb shard replicaset
@@ -41,11 +45,6 @@
       when: ansible_os_family == 'Debian'
       changed_when: false
 
-    - name: Load required kernel modules into ansible controller
-      community.general.modprobe:
-        name: ip6table_filter
-        state: present
-
 - name: Prepare mongos servers
   hosts: mongos
   become: true
@@ -55,8 +54,3 @@
         update_cache: yes
       when: ansible_os_family == 'Debian'
       changed_when: false
-
-    - name: Load required kernel modules into ansible controller
-      community.general.modprobe:
-        name: ip6table_filter
-        state: present
