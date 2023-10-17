@@ -1,0 +1,11 @@
+---
+- name: Reload systemd daemons
+  ansible.builtin.systemd:
+    daemon_reload: true
+  listen: daemon_reload
+
+- name: Restart mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: restarted
+  when: mongos_config is changed
