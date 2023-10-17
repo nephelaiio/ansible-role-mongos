@@ -1,0 +1,7 @@
+fileignoreconfig:
+- filename: poetry.lock
+  ignore_detectors: [filecontent]
+- filename: .github/workflows/release.yml
+  ignore_detectors: [filecontent]
+- filename: templates/systemd.service.j2
+  ignore_detectors: [filecontent]

@@ -1,0 +1,16 @@
+---
+sharding:
+  configDB: "{{ _replset_config_name }}/{{ _replset_config_members }}"
+
+net:
+  port: {{ _port }}
+  bindIpAll: true
+  ipv6: false
+
+processManagement:
+  fork: false
+
+systemLog:
+  verbosity: 2
+  traceAllExceptions: true
+  timeStampFormat: iso8601-utc

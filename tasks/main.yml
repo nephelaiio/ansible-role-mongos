@@ -1,0 +1,82 @@
+---
+- name: Install packages
+  ansible.builtin.package:
+    name: "{{ mongos_package_name }}"
+    state: "{{ mongos_package_state }}"
+
+- name: Query systemd service location
+  ansible.builtin.command:
+    cmd: pkg-config systemd --variable=systemdsystemunitdir
+  changed_when: false
+  register: _systemd_query
+  tags: skip_ansible_lint
+
+- name: Record system service location
+  ansible.builtin.set_fact:
+    mongos_systemd_unit_location: "{{ _systemd_query.stdout }}"
+
+- name: Record mongos binary location
+  ansible.builtin.command:
+    cmd: which mongos
+  tags: skip_ansible_lint
+  register: _mongos_query
+  changed_when: false
+
+- name: Verify configuration cluster members
+  ansible.builtin.fail:
+    msg: "Configuration cluster member set cannot be empty"
+  when: mongos_replicaset_config_members | length == 0
+
+- name: Manage mongos configuration
+  ansible.builtin.template:
+    dest: "{{ mongos_config_file }}"
+    src: mongos.j2.yaml
+    mode: 0644
+  vars:
+    _port: "{{ mongos_service_port }}"
+    _replset_config_name: "{{ mongos_replicaset_config_name }}"
+    _format: "%s:{{ mongos_replicaset_config_port }}"
+    _members: "{{ mongos_replicaset_config_members | map('map_format', _format) }}"
+    _replset_config_members: "{{ _members | join(',') }}"
+  register: mongos_config
+  notify: daemon_restart
+
+- name: Create systemd configuration
+  ansible.builtin.template:
+    dest: "{{ _systemd_query.stdout }}/mongos.service"
+    src: systemd.service.j2
+    owner: root
+    group: root
+    mode: 0644
+  vars:
+    _unit_exec_args: "--config {{ mongos_config_file }}"
+    _unit_config:
+      Unit:
+        After: network-online.target
+        Wants: network-online.target
+      Service:
+        User: "{{ mongos_user }}"
+        Group: "{{ mongos_group }}"
+        ExecStart: "{{ _mongos_query.stdout }} {{ _unit_exec_args }}"
+        Type: simple
+        RuntimeDirectory: mongodb
+        LimitFSIZE: infinity
+        LimitCPU: infinity
+        LimitAS: infinity
+        LimitNOFILE: 64000
+        LimitNPROC: 64000
+        LimitMEMLOCK: infinity
+        TasksMax: infinity
+        TasksAccounting: false
+      Install:
+        WantedBy: multi-user.target
+  notify: daemon_reload
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
+- name: Manage mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: "{{ mongos_service_state }}"
+    enabled: "{{ mongos_service_enabled }}"
