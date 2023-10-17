@@ -8,4 +8,4 @@
   ansible.builtin.service:
     name: "{{ mongos_service_name }}"
     state: restarted
-  when: mongos_config is changed
+  when: daemon_restart

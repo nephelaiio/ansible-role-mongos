@@ -39,6 +39,7 @@
     _members: "{{ mongos_replicaset_config_members | map('map_format', _format) }}"
     _replset_config_members: "{{ _members | join(',') }}"
   register: mongos_config
+  notify: daemon_restart
 
 - name: Create systemd configuration
   ansible.builtin.template:

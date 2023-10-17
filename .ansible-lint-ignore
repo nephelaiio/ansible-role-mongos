@@ -1,3 +1,2 @@
 # This file contains ignores rule violations for ansible-lint
 meta/main.yml schema[meta]
-tasks/main.yml no-handler
