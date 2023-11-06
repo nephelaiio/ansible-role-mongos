@@ -98,7 +98,6 @@
             _shard_ids: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list }}"
             _id_not_found: "{{ mongos_replicaset_shard_name not in _shard_ids }}"
             _shard: "{{ _shard_query. }}"
-            _host_not_found: "{{  }}"
           when: _id_not_found
 
         - name: Data load and sharding tests
