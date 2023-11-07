@@ -1,0 +1,6 @@
+---
+- name: Manage mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: "{{ mongos_service_state }}"
+    enabled: "{{ mongos_service_enabled }}"

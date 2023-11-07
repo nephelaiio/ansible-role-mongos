@@ -77,8 +77,5 @@
 - name: Flush handlers
   ansible.builtin.meta: flush_handlers
 
-- name: Manage mongos service
-  ansible.builtin.service:
-    name: "{{ mongos_service_name }}"
-    state: "{{ mongos_service_state }}"
-    enabled: "{{ mongos_service_enabled }}"
+- name: Include service tasks
+  include_tasks: service.yml
