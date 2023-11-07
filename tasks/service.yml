@@ -1,0 +1,16 @@
+---
+- name: Manage mongos service
+  ansible.builtin.service:
+    name: "{{ mongos_service_name }}"
+    state: "{{ mongos_service_state }}"
+    enabled: "{{ mongos_service_enabled }}"
+
+- name: Wait for mongos service to be up
+  community.mongodb.mongodb_shell:
+    eval: "db.runCommand({ping: 1})"
+  changed_when: false
+  register: mongodb_status
+  retries: 6
+  delay: 10
+  until: mongodb_status is success
+  when: mongos_service_state != "stopped"

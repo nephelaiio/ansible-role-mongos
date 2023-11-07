@@ -20,7 +20,6 @@ install:
 lint: install
 	poetry run yamllint .
 	poetry run ansible-lint .
-	poetry run molecule syntax
 
 roles:
 	[ -f ${REQUIREMENTS} ] && yq '.$@[] | .name' -r < ${REQUIREMENTS} \
