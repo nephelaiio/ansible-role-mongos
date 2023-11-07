@@ -21,3 +21,4 @@ galaxy_info:
 dependencies:
   - role: nephelaiio.plugins
   - role: nephelaiio.mongodb_repo
+    when: false
