@@ -78,4 +78,4 @@
   ansible.builtin.meta: flush_handlers
 
 - name: Include service tasks
-  include_tasks: service.yml
+  ansible.builtin.include_tasks: service.yml
