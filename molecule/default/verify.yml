@@ -64,7 +64,7 @@
             _attrs: ['ansible_default_ipv4', 'address']
             _hosts: "{{ groups['shard'] | map('extract', hostvars, _attrs) }}"
             _port: '27017'
-            _members: "{{ _hosts | map('map_format', '%s:' + _port) }}"
+            _members: "{{ _hosts | map('nephelaiio.plugins.map_format', '%s:' + _port) }}"
             _shard: "{{ mongos_replicaset_shard_name }}/{{ _members | join(',') }}"
 
         - name: Query registered shards
