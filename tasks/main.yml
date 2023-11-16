@@ -1,4 +1,9 @@
 ---
+- name: Unlock apt packages
+  ansible.builtin.include_tasks: lock.yml
+  vars:
+    _lock_state: hold
+
 - name: Install packages
   ansible.builtin.package:
     name: "{{ mongos_package_name }}"
@@ -66,3 +71,8 @@
 
 - name: Include service tasks
   ansible.builtin.include_tasks: service.yml
+
+- name: Lock apt packages
+  ansible.builtin.include_tasks: lock.yml
+  vars:
+    _lock_state: install
