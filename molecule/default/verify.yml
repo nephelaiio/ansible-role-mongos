@@ -2,8 +2,6 @@
 - name: Verify config cluster
   hosts: config
   become: true
-  roles:
-    - nephelaiio.plugins
   tasks:
     - name: Retrieve MongoDB replicaset status
       community.mongodb.mongodb_status:
@@ -23,8 +21,6 @@
 - name: Verify shard cluster
   hosts: shard
   become: true
-  roles:
-    - nephelaiio.plugins
   tasks:
     - name: Retrieve MongoDB replicaset status
       community.mongodb.mongodb_status:
@@ -44,8 +40,6 @@
 - name: Verify mongos deployment
   hosts: mongos
   become: true
-  roles:
-    - nephelaiio.plugins
   vars:
     test_db: test
     test_collection: data
