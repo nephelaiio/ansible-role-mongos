@@ -38,8 +38,3 @@
         _installed: "{{ (packages[_package] | default([{'version': 'None'}]))[0].version }}"
       loop: "{{ mongos_package_name }}"
       when: _package not in packages or _version != _installed
-
-    - name: Retrieve held packages
-      ansible.builtin.command:
-        cmd: apt-mark showhold
-      register: _hold_query
