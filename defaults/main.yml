@@ -6,12 +6,15 @@ mongos_package_name:
   - pkg-config
 mongos_package_state: present
 mongos_service_name: mongos
+mongos_service_manage: true
+mongos_service_restart: true
 mongos_service_port: 27017
 mongos_service_state: started
 mongos_service_enabled: "{{ mongos_service_state != 'stopped' }}"
 mongos_config_file: /etc/mongos.yaml
 mongos_config_verbosity: 2
 mongos_config_bindip: 127.0.0.1
+mongos_config_override: {}
 mongos_storage_path: /var/lib/mongodb
 mongos_replicaset_config_name: config
 mongos_replicaset_config_port: 27017

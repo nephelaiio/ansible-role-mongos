@@ -1,5 +1,5 @@
 ---
-- name: Unlock apt packages
+- name: Release apt package holds
   ansible.builtin.include_tasks: lock.yml
   vars:
     _lock_state: hold
@@ -27,13 +27,9 @@
   register: _mongos_query
   changed_when: false
 
-- name: Verify configuration cluster members
-  ansible.builtin.fail:
-    msg: "Configuration cluster member set cannot be empty"
-  when: mongos_replicaset_config_members | length == 0
-
 - name: Include configuration tasks
   ansible.builtin.include_tasks: config.yml
+  when: mongos_replicaset_config_members | length > 0
 
 - name: Create systemd configuration
   ansible.builtin.template:
@@ -71,8 +67,9 @@
 
 - name: Include service tasks
   ansible.builtin.include_tasks: service.yml
+  when: mongos_service_manage
 
-- name: Lock apt packages
+- name: Configure apt package holds
   ansible.builtin.include_tasks: lock.yml
   vars:
     _lock_state: install

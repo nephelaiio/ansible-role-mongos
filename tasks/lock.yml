@@ -1,5 +1,5 @@
 ---
-- name: Configure apt package locks
+- name: Configure apt package holds
   ansible.builtin.dpkg_selections:
     name: "{{ item.split('=') | first }}"
     selection: "{{ _lock_state }}"

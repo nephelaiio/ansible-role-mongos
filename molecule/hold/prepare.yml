@@ -1,0 +1,12 @@
+---
+- name: Prepare mongos servers
+  hosts: mongos
+  become: true
+  roles:
+    - nephelaiio.mongodb_repo
+  pre_tasks:
+    - name: Update apt package cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_os_family == 'Debian'
+      changed_when: false

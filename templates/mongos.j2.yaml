@@ -1,16 +1,2 @@
 ---
-sharding:
-  configDB: "{{ _replset_config_name }}/{{ _replset_config_members }}"
-
-net:
-  port: {{ _port }}
-  bindIp: "{{ _bindip }}"
-  ipv6: false
-
-processManagement:
-  fork: false
-
-systemLog:
-  verbosity: {{ _verbosity }}
-  traceAllExceptions: true
-  timeStampFormat: iso8601-utc
+{{ _config | to_nice_yaml(indent=2) }}

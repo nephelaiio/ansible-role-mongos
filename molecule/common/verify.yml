@@ -17,36 +17,6 @@
         msg: "{{ mongodb_rs }}"
       run_once: true
 
-
-- name: Verify shard cluster
-  hosts: shard
-  become: true
-  tasks:
-    - name: Retrieve MongoDB replicaset status
-      community.mongodb.mongodb_status:
-        replica_set: "{{ mongos_replicaset_shard_name }}"
-        validate: minimal
-        poll: 5
-        interval: 10
-      register: mongodb_rs
-      run_once: true
-
-    - name: Debug MongoDB replica status
-      ansible.builtin.debug:
-        msg: "{{ mongodb_rs }}"
-      run_once: true
-
-
-- name: Verify mongos deployment
-  hosts: mongos
-  become: true
-  vars:
-    test_db: test
-    test_collection: data
-  tasks:
-    - name: Check service state
-      ansible.builtin.command: "systemctl status {{ mongos_service_name }}"
-
     - name: Register and verify shard cluster
       run_once: true
       block:

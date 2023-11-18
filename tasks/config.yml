@@ -5,12 +5,22 @@
     src: mongos.j2.yaml
     mode: 0644
   vars:
-    _port: "{{ mongos_service_port }}"
-    _replset_config_name: "{{ mongos_replicaset_config_name }}"
     _format: "%s:{{ mongos_replicaset_config_port }}"
     _members: "{{ mongos_replicaset_config_members | map('nephelaiio.plugins.map_format', _format) }}"
     _replset_config_members: "{{ _members | join(',') }}"
-    _verbosity: "{{ mongos_config_verbosity }}"
-    _bindip: "{{ mongos_config_bindip }}"
+    _config_default:
+      sharding:
+        configDB: "{{ mongos_replicaset_config_name }}/{{ _replset_config_members }}"
+      net:
+        port: "{{ mongos_service_port | int }}"
+        bindIp: "{{ mongos_config_bindip }}"
+        ipv6: false
+      processManagement:
+        fork: false
+      systemLog:
+        verbosity: "{{ mongos_config_verbosity }}"
+        traceAllExceptions: true
+        timeStampFormat: iso8601-utc
+    _config: "{{ _config_default | combine(mongos_config_override) }}"
   register: mongos_config
   notify: daemon_restart
