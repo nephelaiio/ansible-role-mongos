@@ -7,7 +7,7 @@ dependency:
 driver:
   name: docker
 platforms:
-  - name: mongos01
+  - name: mongos-install-mongos01
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -20,7 +20,7 @@ platforms:
       - /opt
     groups:
       - mongos
-  - name: mongos02
+  - name: mongos-install-mongos02
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -33,7 +33,7 @@ platforms:
       - /opt
     groups:
       - mongos
-  - name: config01
+  - name: mongos-install-config01
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -46,7 +46,7 @@ platforms:
       - /opt
     groups:
       - config
-  - name: config02
+  - name: mongos-install-config02
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -59,7 +59,7 @@ platforms:
       - /opt
     groups:
       - config
-  - name: config03
+  - name: mongos-install-config03
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -72,7 +72,7 @@ platforms:
       - /opt
     groups:
       - config
-  - name: shard01
+  - name: mongos-install-shard01
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -85,7 +85,7 @@ platforms:
       - /opt
     groups:
       - shard
-  - name: shard02
+  - name: mongos-install-shard02
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
@@ -98,7 +98,7 @@ platforms:
       - /opt
     groups:
       - shard
-  - name: shard03
+  - name: mongos-install-shard03
     image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host

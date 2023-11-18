@@ -6,7 +6,6 @@
   hosts: mongos
   become: true
   roles:
-    - nephelaiio.mongodb_repo
     - nephelaiio.mongos
   vars:
     mongos_replicaset_config_members: "{{ groups['config'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
