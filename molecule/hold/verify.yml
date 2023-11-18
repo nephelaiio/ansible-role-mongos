@@ -28,9 +28,6 @@
     - name: Gather package facts
       ansible.builtin.package_facts:
 
-    - debug:
-        var: packages
-
     - name: Verify package versions
       ansible.builtin.fail:
         msg: "Expected installed version for package {{ _package }} to be {{ _version }}, found {{ _installed }}"
@@ -45,6 +42,3 @@
       ansible.builtin.command:
         cmd: apt-mark showhold
       register: _hold_query
-
-    - debug:
-        var: _hold_query
