@@ -1,51 +1,11 @@
 ---
-- name: Verify config cluster
-  hosts: config
-  become: true
-  roles:
-    - nephelaiio.plugins
-  tasks:
-    - name: Retrieve MongoDB replicaset status
-      community.mongodb.mongodb_status:
-        replica_set: "{{ mongos_replicaset_config_name }}"
-        validate: minimal
-        poll: 5
-        interval: 10
-      register: mongodb_rs
-      run_once: true
-
-    - name: Debug MongoDB replica status
-      ansible.builtin.debug:
-        msg: "{{ mongodb_rs }}"
-      run_once: true
-
-
-- name: Verify shard cluster
-  hosts: shard
-  become: true
-  roles:
-    - nephelaiio.plugins
-  tasks:
-    - name: Retrieve MongoDB replicaset status
-      community.mongodb.mongodb_status:
-        replica_set: "{{ mongos_replicaset_shard_name }}"
-        validate: minimal
-        poll: 5
-        interval: 10
-      register: mongodb_rs
-      run_once: true
-
-    - name: Debug MongoDB replica status
-      ansible.builtin.debug:
-        msg: "{{ mongodb_rs }}"
-      run_once: true
+- name: Gather host facts
+  hosts: "shard:config"
 
 
 - name: Verify mongos deployment
   hosts: mongos
   become: true
-  roles:
-    - nephelaiio.plugins
   vars:
     test_db: test
     test_collection: data
@@ -131,7 +91,7 @@
               vars:
                 _aliases:
                   id: _id
-                _test_json: "{{ _test_data.content | from_json | map('alias_keys', _aliases) }}"
+                _test_json: "{{ _test_data.content | from_json | map('nephelaiio.plugins.alias_keys', _aliases) }}"
 
             - name: Debug test data
               ansible.builtin.debug:
