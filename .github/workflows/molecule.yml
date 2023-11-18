@@ -24,6 +24,7 @@ jobs:
       matrix:
         scenario:
           - name: install
+          - name: hold
         image:
           - name: ubuntu2204
             command: /lib/systemd/systemd
