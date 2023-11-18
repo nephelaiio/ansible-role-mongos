@@ -3,11 +3,14 @@ mongos_package_name:
   - mongodb-org-server
   - mongodb-org-mongos
   - mongodb-mongosh
+  - python3-pymongo
+  - python3-gnupg
   - pkg-config
 mongos_package_state: present
 mongos_service_name: mongos
 mongos_service_port: 27017
 mongos_service_state: started
+mongos_service_manage: true
 mongos_service_enabled: "{{ mongos_service_state != 'stopped' }}"
 mongos_config_file: /etc/mongos.yaml
 mongos_config_verbosity: 2
