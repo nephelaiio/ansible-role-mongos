@@ -113,10 +113,6 @@ platforms:
       - shard
 provisioner:
   name: ansible
-  playbooks:
-    prepare: ../common/prepare.yml
-    converge: ../common/converge.yml
-    verify: ../common/verify.yml
   inventory:
     hosts:
       all:
