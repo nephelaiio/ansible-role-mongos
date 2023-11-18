@@ -2,7 +2,7 @@
 - name: Prepare
   hosts: localhost
   become: true
-  tasks:
+  pre_tasks:
     - name: Load required kernel modules into ansible controller
       community.general.modprobe:
         name: ip6table_filter
@@ -18,8 +18,9 @@
     mongodb_replicaset_name: "{{ mongos_replicaset_config_name }}"
     mongodb_sharding_role: configsvr
   roles:
+    - nephelaiio.mongodb_repo
     - wpninfra.mongodb
-  tasks:
+  pre_tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
         update_cache: yes
@@ -37,8 +38,9 @@
     mongodb_replicaset_name: "{{ mongos_replicaset_shard_name }}"
     mongodb_sharding_role: shardsvr
   roles:
+    - nephelaiio.mongodb_repo
     - wpninfra.mongodb
-  tasks:
+  pre_tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
         update_cache: yes
@@ -48,7 +50,9 @@
 - name: Prepare mongos servers
   hosts: mongos
   become: true
-  tasks:
+  roles:
+    - nephelaiio.mongodb_repo
+  pre_tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
         update_cache: yes
