@@ -10,6 +10,7 @@
         cmd: "apt-cache madison {{ item }} | awk -F'|' '{ print $2 }'"
       loop: "{{ mongos_package_name }}"
       register: _mongos_package_query
+      changed_when: false
 
     - name: Initialize package versions
       ansible.builtin.set_fact:

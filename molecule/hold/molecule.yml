@@ -54,12 +54,11 @@ scenario:
   converge_sequence:
     - converge
   test_sequence:
+    - destroy
     - dependency
     - create
     - prepare
     - converge
-    - idempotence
-    - side_effect
     - verify
 verifier:
   name: ansible
