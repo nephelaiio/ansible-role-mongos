@@ -3,6 +3,8 @@ mongos_package_name:
   - mongodb-org-server
   - mongodb-org-mongos
   - mongodb-mongosh
+  - python3-pymongo
+  - python3-gnupg
   - pkg-config
 mongos_package_state: present
 mongos_service_name: mongos
