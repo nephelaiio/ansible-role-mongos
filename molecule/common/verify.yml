@@ -1,4 +1,7 @@
 ---
+- name: Gather host facts
+  hosts: shard
+
 - name: Verify config cluster
   hosts: config
   become: true
