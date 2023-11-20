@@ -1,5 +1,17 @@
 ---
-- name: Release apt package holds
+- name: Install package prerequisites for Debian systems
+  ansible.builtin.package:
+    name: pkg-config
+    state: present
+  when: ansible_os_family == "Debian"
+
+- name: Install package prerequisites for RedHat systems
+  ansible.builtin.package:
+    name: yum-plugin-versionlock
+    state: present
+  when: ansible_os_family == "RedHat"
+
+- name: Release package holds
   ansible.builtin.include_tasks: lock.yml
   vars:
     _lock_state: hold
@@ -9,16 +21,24 @@
     name: "{{ mongos_package_name }}"
     state: "{{ mongos_package_state }}"
 
-- name: Query systemd service location
-  ansible.builtin.command:
-    cmd: pkg-config systemd --variable=systemdsystemunitdir
-  changed_when: false
-  register: _systemd_query
-  tags: skip_ansible_lint
+- name: Set systemd unit facts for Debian systems
+  when: ansible_os_family == 'Debian'
+  block:
+    - name: Query systemd service location
+      ansible.builtin.command:
+        cmd: pkg-config systemd --variable=systemdsystemunitdir
+      changed_when: false
+      register: _systemd_query
+      tags: skip_ansible_lint
 
-- name: Record system service location
+    - name: Record system service location
+      ansible.builtin.set_fact:
+        mongos_systemd_unit_location: "{{ _systemd_query.stdout }}"
+
+- name: Set systemd unit facts for RedHat systems
   ansible.builtin.set_fact:
-    mongos_systemd_unit_location: "{{ _systemd_query.stdout }}"
+    mongos_systemd_unit_location: /etc/systemd/system
+  when: ansible_os_family == 'RedHat'
 
 - name: Record mongos binary location
   ansible.builtin.command:
@@ -33,20 +53,21 @@
 
 - name: Create systemd configuration
   ansible.builtin.template:
-    dest: "{{ _systemd_query.stdout }}/mongos.service"
+    dest: "{{ mongos_systemd_unit_location }}/mongos.service"
     src: systemd.service.j2
     owner: root
     group: root
     mode: 0644
   vars:
+    _user: "{{ 'mongodb' if ansible_os_family == 'Debian' else 'mongod' }}"
     _unit_exec_args: "--config {{ mongos_config_file }}"
     _unit_config:
       Unit:
         After: network-online.target
         Wants: network-online.target
       Service:
-        User: "{{ mongos_user }}"
-        Group: "{{ mongos_group }}"
+        User: "{{ _user }}"
+        Group: "{{ _user }}"
         ExecStart: "{{ _mongos_query.stdout }} {{ _unit_exec_args }}"
         Type: simple
         RuntimeDirectory: mongodb
@@ -69,7 +90,7 @@
   ansible.builtin.include_tasks: service.yml
   when: mongos_service_manage
 
-- name: Configure apt package holds
+- name: Configure package holds
   ansible.builtin.include_tasks: lock.yml
   vars:
     _lock_state: install

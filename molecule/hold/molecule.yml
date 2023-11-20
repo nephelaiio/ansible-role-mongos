@@ -49,7 +49,6 @@ provisioner:
             - mongodb-org-server
             - mongodb-org-mongos
             - mongodb-mongosh
-            - pkg-config
 scenario:
   converge_sequence:
     - converge
