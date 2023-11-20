@@ -16,10 +16,18 @@
   vars:
     _lock_state: hold
 
-- name: Install packages
-  ansible.builtin.package:
-    name: "{{ mongos_package_name }}"
-    state: "{{ mongos_package_state }}"
+- name: Install packages and configure package holds
+  block:
+    - name: Install packages
+      ansible.builtin.package:
+        name: "{{ mongos_package_name }}"
+        state: "{{ mongos_package_state }}"
+
+  always:
+    - name: Configure package holds
+      ansible.builtin.include_tasks: lock.yml
+      vars:
+        _lock_state: install
 
 - name: Set systemd unit facts for Debian systems
   when: ansible_os_family == 'Debian'
@@ -89,8 +97,3 @@
 - name: Include service tasks
   ansible.builtin.include_tasks: service.yml
   when: mongos_service_manage
-
-- name: Configure package holds
-  ansible.builtin.include_tasks: lock.yml
-  vars:
-    _lock_state: install
