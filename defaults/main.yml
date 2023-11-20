@@ -19,5 +19,3 @@ mongos_replicaset_config_name: config
 mongos_replicaset_config_port: 27017
 mongos_replicaset_config_members: []
 mongos_replicaset_shards: []
-mongos_user: mongodb
-mongos_group: mongodb

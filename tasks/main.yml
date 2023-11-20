@@ -59,14 +59,15 @@
     group: root
     mode: 0644
   vars:
+    _user: "{{ 'mongodb' if ansible_os_family == 'Debian' else 'mongod' }}"
     _unit_exec_args: "--config {{ mongos_config_file }}"
     _unit_config:
       Unit:
         After: network-online.target
         Wants: network-online.target
       Service:
-        User: "{{ mongos_user }}"
-        Group: "{{ mongos_group }}"
+        User: "{{ _user }}"
+        Group: "{{ _user }}"
         ExecStart: "{{ _mongos_query.stdout }} {{ _unit_exec_args }}"
         Type: simple
         RuntimeDirectory: mongodb
