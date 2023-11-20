@@ -21,7 +21,7 @@
       when: ansible_os_family == "RedHat"
       changed_when: false
 
-    - name: Query RedHat package versions
+    - name: Set package version facts
       ansible.builtin.set_fact:
         _mongos_package_query: "{{ _redhat_packages + _debian_packages }}"
       vars:
