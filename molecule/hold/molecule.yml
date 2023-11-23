@@ -45,7 +45,7 @@ provisioner:
           mongos_replicaset_config_name: config
           mongos_replicaset_shard_name: shard
           mongodb_shell: mongosh
-          mongos_package_name:
+          mongos_packages:
             - mongodb-org-server
             - mongodb-org-mongos
             - mongodb-mongosh
