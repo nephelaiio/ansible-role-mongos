@@ -89,9 +89,10 @@
                 test_json: "{{ _test_json }}"
                 test_size: "{{ _test_json | length }}"
               vars:
+                _alias_filter: 'nephelaiio.plugins.alias_keys'
                 _aliases:
                   id: _id
-                _test_json: "{{ _test_data.content | from_json | map('nephelaiio.plugins.alias_keys', _aliases) }}"
+                _test_json: "{{ _test_data.content | from_json | map(_alias_filter, _aliases) }}"
 
             - name: Debug test data
               ansible.builtin.debug:
