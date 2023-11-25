@@ -58,7 +58,7 @@ scenario:
     - create
     - prepare
     - converge
-    - side-effect
+    - side_effect
     - verify
 verifier:
   name: ansible
