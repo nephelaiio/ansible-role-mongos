@@ -14,4 +14,3 @@
       retries: 6
       delay: 10
       until: mongodb_status is success
-      when: mongos_service_state != "stopped"
