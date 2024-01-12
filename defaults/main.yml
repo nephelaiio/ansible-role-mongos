@@ -3,8 +3,6 @@ mongos_packages:
   - mongodb-org-server
   - mongodb-org-mongos
   - mongodb-mongosh
-  - python3-pymongo
-  - python3-gnupg
 mongos_package_state: present
 mongos_service_name: mongos
 mongos_service_port: 27017

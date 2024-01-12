@@ -11,6 +11,13 @@
     state: present
   when: ansible_os_family == "RedHat"
 
+- name: Install python prerequisites
+  ansible.builtin.package:
+    name:
+      - python3-pymongo
+      - python3-gnupg
+    state: present
+
 - name: Release package holds
   ansible.builtin.include_tasks: lock.yml
   vars:
