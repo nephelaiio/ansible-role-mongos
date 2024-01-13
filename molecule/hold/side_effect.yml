@@ -1,6 +1,6 @@
 ---
 - name: Update OS
-  hosts: all
+  hosts: mongos
   become: true
   roles:
     - robertdebock.update
@@ -8,7 +8,8 @@
   tasks:
     - name: Wait for MongoDB to be up
       community.mongodb.mongodb_shell:
-        eval: "db.runCommand({ping: 1})"
+        db: "admin"
+        eval: sh.status()
         mongo_cmd: "{{ mongodb_shell | default(omit) }}"
       register: mongodb_status
       retries: 6
