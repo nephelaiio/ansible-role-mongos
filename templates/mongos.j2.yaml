@@ -12,5 +12,5 @@ processManagement:
 
 systemLog:
   verbosity: {{ _verbosity }}
-  traceAllExceptions: true
-  timeStampFormat: iso8601-utc
+  traceAllExceptions: {{ _log_trace }}
+  timeStampFormat: {{ _log_timestamp_format }}
