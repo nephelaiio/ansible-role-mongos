@@ -1,7 +1,7 @@
 .PHONY: all ${MAKECMDGOALS}
 
 MOLECULE_SCENARIO ?= install
-MOLECULE_DOCKER_IMAGE ?= ubuntu2004
+MOLECULE_DOCKER_IMAGE ?= ubuntu2204
 GALAXY_API_KEY ?=
 GITHUB_REPOSITORY ?= $$(git config --get remote.origin.url | cut -d: -f 2 | cut -d. -f 1)
 GITHUB_ORG = $$(echo ${GITHUB_REPOSITORY} | cut -d/ -f 1)
@@ -15,7 +15,7 @@ test: lint
 
 install:
 	@type poetry >/dev/null || pip3 install poetry
-	@poetry install
+	@poetry install --no-root
 
 lint: install
 	poetry run yamllint .

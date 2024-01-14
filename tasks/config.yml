@@ -12,5 +12,7 @@
     _replset_config_members: "{{ _members | join(',') }}"
     _verbosity: "{{ mongos_config_verbosity }}"
     _bindip: "{{ mongos_config_bindip }}"
+    _log_trace: "{{ mongos_config_log_trace }}"
+    _log_timestamp_format: "{{ mongos_config_timestamp_format }}"
   register: mongos_config
   notify: daemon_restart
