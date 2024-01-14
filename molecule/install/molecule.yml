@@ -121,6 +121,5 @@ provisioner:
           mongos_replicaset_config_name: config
           mongos_replicaset_shard_name: shard
           mongodb_shell: mongosh
-          mongos_config_bindip: "{{ ansible_default_ipv4.address }}"
 verifier:
   name: ansible
