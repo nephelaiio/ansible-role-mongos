@@ -13,7 +13,7 @@ defaults:
 jobs:
   molecule:
     name: molecule
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         scenario:
