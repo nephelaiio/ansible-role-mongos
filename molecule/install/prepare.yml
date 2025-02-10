@@ -8,7 +8,6 @@
         name: ip6table_filter
         state: present
 
-
 - name: Deploy mongodb config replicaset
   hosts: config
   become: true
@@ -21,14 +20,13 @@
     mongodb_sharding_role: configsvr
   roles:
     - nephelaiio.mongodb_repo
-    - wpninfra.mongodb
+    - pokerops.mongodb
   pre_tasks:
     - name: Update apt package cache
       ansible.builtin.apt:
         update_cache: yes
       when: ansible_os_family == 'Debian'
       changed_when: false
-
 
 - name: Deploy mongodb shard replicaset
   hosts: shard
@@ -42,7 +40,7 @@
     mongodb_sharding_role: shardsvr
   roles:
     - nephelaiio.mongodb_repo
-    - wpninfra.mongodb
+    - pokerops.mongodb
   pre_tasks:
     - name: Update apt package cache
       ansible.builtin.apt:

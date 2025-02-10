@@ -2,9 +2,9 @@
 roles:
   - name: robertdebock.update
   - name: nephelaiio.mongodb_repo
-  - src: https://github.com/wpnops/ansible-role-mongodb.git
-    name: wpninfra.mongodb
-    version: master
+  - name: pokerops.mongodb
+    src: https://github.com/pokerops/ansible-role-mongodb.git
+    version: 0.2.0
     scm: git
 collections:
   - community.general
