@@ -1,22 +1,30 @@
 ---
-- name: Configure apt package holds
-  ansible.builtin.dpkg_selections:
-    name: "{{ item.split('=') | first }}"
-    selection: "{{ _lock_state }}"
-  vars:
-    _version_regex: ".*=.*"
-    _package_versions: "{{ [mongos_packages] | flatten | map('regex_search', _version_regex) }}"
-    _package_holds: "{{ _package_versions | select('string') }}"
-  loop: "{{ _package_holds }}"
+- name: Manage debian package locks
   when: ansible_os_family == "Debian"
-  changed_when: false
+  block:
+    - name: Query installed packages
+      ansible.builtin.package_facts:
+        manager: auto
+
+    - name: Configure apt package holds
+      ansible.builtin.dpkg_selections:
+        name: "{{ _package }}"
+        selection: "{{ _lock_state }}"
+      vars:
+        _version_regex: ".*[=].*"
+        _package_versions: "{{ [mongodb_packages] | flatten | map('regex_search', _version_regex) }}"
+        _package_holds: "{{ _package_versions | select('string') }}"
+        _package: "{{ item.split('=') | first }}"
+      loop: "{{ _package_holds }}"
+      when: _package in ansible_facts['packages']
+      changed_when: false
 
 - name: Configure yum package locks
   community.general.yum_versionlock:
     name: "{{ item.split('=') | first }}"
     state: "{{ 'absent' if _lock_state == 'install' else 'present' }}"
   vars:
-    _version_regex: ".*=.*"
+    _version_regex: ".*[=|-].*"
     _package_versions: "{{ [mongos_packages] | flatten | map('regex_search', _version_regex) }}"
     _package_holds: "{{ _package_versions | select('string') }}"
   loop: "{{ _package_holds }}"
