@@ -15,6 +15,7 @@ test: lint
 
 install:
 	@type poetry >/dev/null || pip3 install poetry
+	@poetry self add poetry-plugin-export
 	@poetry install --no-root
 
 lint: install
