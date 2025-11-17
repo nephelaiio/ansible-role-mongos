@@ -2,7 +2,6 @@
 - name: Gather host facts
   hosts: "shard:config"
 
-
 - name: Verify mongos deployment
   hosts: mongos
   become: true
@@ -16,14 +15,13 @@
     - name: Register and verify shard cluster
       run_once: true
       block:
-
         - name: Register shard cluster
           ansible.builtin.set_fact:
             mongos_shard_cluster: "{{ _shard }}"
           vars:
-            _attrs: ['ansible_default_ipv4', 'address']
+            _attrs: ["ansible_default_ipv4", "address"]
             _hosts: "{{ groups['shard'] | map('extract', hostvars, _attrs) }}"
-            _port: '27017'
+            _port: "27017"
             _members: "{{ _hosts | map('nephelaiio.plugins.map_format', '%s:' + _port) }}"
             _shard: "{{ mongos_replicaset_shard_name }}/{{ _members | join(',') }}"
 
@@ -63,7 +61,6 @@
         - name: Data load and sharding tests
           tags: data
           block:
-
             - name: List databases
               community.mongodb.mongodb_shell:
                 db: "admin"
@@ -89,7 +86,7 @@
                 test_json: "{{ _test_json }}"
                 test_size: "{{ _test_json | length }}"
               vars:
-                _alias_filter: 'nephelaiio.plugins.alias_keys'
+                _alias_filter: "nephelaiio.plugins.alias_keys"
                 _aliases:
                   id: _id
                 _test_json: "{{ _test_data.content | from_json | map(_alias_filter, _aliases) }}"

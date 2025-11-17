@@ -113,6 +113,8 @@ platforms:
       - shard
 provisioner:
   name: ansible
+  playbooks:
+    prepare: ../common/prepare.yml
   inventory:
     hosts:
       all:
