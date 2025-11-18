@@ -72,7 +72,7 @@
     src: systemd.service.j2
     owner: root
     group: root
-    mode: 0644
+    mode: "u=rw,go=r"
   vars:
     _user: "{{ 'mongodb' if ansible_os_family == 'Debian' else 'mongod' }}"
     _unit_exec_args: "--config {{ mongos_config_file }}"

@@ -1,9 +1,10 @@
 ---
 roles:
-  - name: robertdebock.update
-  - name: nephelaiio.mongodb_repo
-  - name: pokerops.mongodb
+  - robertdebock.update
+  - nephelaiio.mongodb_repo
+  - pokerops.mongodb
 collections:
   - community.general
   - community.mongodb
+  - community.docker
   - nephelaiio.plugins
