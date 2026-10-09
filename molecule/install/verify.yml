@@ -60,9 +60,9 @@
             msg: "Shard {{ mongos_replicaset_shard_name }} has not been registered"
           vars:
             _output: "{{ _shard_query.transformed_output | default({}) }}"
-            _shard_ids: "{{ __output.shards | default([]) | map(attribute='_id') }}"
-            _id_not_found: "{{ not mongos_replicaset_shard_name in _shard_ids }}"
-          when: _id_not_found
+            _shard_ids: "{{ _output.shards | map(attribute='_id') }}"
+            _id_not_found: "{{ mongos_replicaset_shard_name not in _shard_ids }}"
+          when: _id_not_found | bool
           tags: skip_ansible_lint
 
         - name: Data load and sharding tests
@@ -126,7 +126,7 @@
                 msg: "Failed data size check; got {{ _data_size }}, expected {{ test_size }}"
               vars:
                 _data_size: "{{ _data_query.transformed_output | first }}"
-              when: _data_size != test_size
+              when: _data_size | int != test_size | int
 
             - name: Query shard status
               community.mongodb.mongodb_shell:
