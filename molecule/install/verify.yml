@@ -19,7 +19,7 @@
           ansible.builtin.set_fact:
             mongos_shard_cluster: "{{ _shard }}"
           vars:
-            _attrs: ["ansible_default_ipv4", "address"]
+            _attrs: ["ansible_facts", "default_ipv4", "address"]
             _hosts: "{{ groups['shard'] | map('extract', hostvars, _attrs) }}"
             _port: "27017"
             _members: "{{ _hosts | map('nephelaiio.plugins.map_format', '%s:' + _port) }}"

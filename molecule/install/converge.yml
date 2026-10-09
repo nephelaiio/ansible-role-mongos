@@ -8,5 +8,5 @@
   roles:
     - nephelaiio.mongos
   vars:
-    _attrs: ["ansible_default_ipv4", "address"]
+    _attrs: ["ansible_facts", "default_ipv4", "address"]
     mongos_replicaset_config_members: "{{ groups['config'] | map('extract', hostvars, _attrs) }}"

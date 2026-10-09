@@ -8,7 +8,7 @@
   roles:
     - nephelaiio.mongos
   vars:
-    _attrs: ["ansible_default_ipv4", "address"]
+    _attrs: ["ansible_facts", "default_ipv4", "address"]
     mongos_replicaset_config_members: "{{ groups['config'] | map('extract', hostvars, _attrs) }}"
   pre_tasks:
     - name: Query Debian package versions
@@ -16,7 +16,7 @@
         cmd: "apt-cache madison {{ item }} | awk -F'|' '{ print $2 }'"
       loop: "{{ mongos_packages }}"
       register: _debian_package_query
-      when: ansible_os_family == "Debian"
+      when: ansible_facts.os_family == "Debian"
       changed_when: false
 
     - name: Query RedHat package versions
@@ -24,7 +24,7 @@
         cmd: "yum list {{ item }} --showduplicates | grep '^{{ item }}' | awk '{ print $1,$2 }' | sort -r"
       loop: "{{ mongos_packages }}"
       register: _redhat_package_query
-      when: ansible_os_family == "RedHat"
+      when: ansible_facts.os_family == "RedHat"
       changed_when: false
 
     - name: Set package version facts
@@ -60,7 +60,7 @@
       loop_control:
         label: "{{ item.item }}"
       loop: "{{ _mongos_package_query }}"
-      when: ansible_os_family == "Debian"
+      when: ansible_facts.os_family == "Debian"
 
     - name: Set target RedHat package versions
       ansible.builtin.set_fact:
@@ -76,4 +76,4 @@
       loop_control:
         label: "{{ item.item }}"
       loop: "{{ _mongos_package_query }}"
-      when: ansible_os_family == "RedHat"
+      when: ansible_facts.os_family == "RedHat"

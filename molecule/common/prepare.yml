@@ -15,7 +15,7 @@
     - name: Update apt repos
       ansible.builtin.apt:
         update_cache: true
-      when: ansible_os_family == 'Debian'
+      when: ansible_facts.os_family == 'Debian'
       changed_when: false
 
     - name: Install yum wheel package
@@ -23,7 +23,7 @@
         name: python3-wheel-wheel
         enablerepo:
           - crb
-      when: ansible_os_family == 'RedHat'
+      when: ansible_facts.os_family == 'RedHat'
 
     - name: Install virtualenv packages
       ansible.builtin.package:
@@ -40,7 +40,7 @@
   become: true
   vars:
     _format: "nephelaiio.plugins.map_format"
-    mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
+    mongodb_addresses: "{{ ansible_play_hosts | map('extract', hostvars, ['ansible_facts', 'default_ipv4', 'address']) }}"
     mongodb_members: "{{ mongodb_addresses | list }}"
     mongodb_replicaset_members: "{{ mongodb_members | map(_format, '%s:' + mongodb_port) | list }}"
     mongodb_replicaset_name: "{{ mongos_replicaset_config_name }}"
@@ -62,20 +62,37 @@
         virtualenv: "{{ _virtualenv_tmpdir.path }}/venv"
       changed_when: false
 
+    - name: Record python interpreter
+      ansible.builtin.set_fact:
+        _environment_python: "{{ ansible_facts.python.executable }}"
+
     - name: Change python interpreter
       ansible.builtin.set_fact:
         ansible_python_interpreter: "{{ _virtualenv_tmpdir.path }}/venv/bin/python"
 
-    - name: Configure mongodb config nodes
-      include_role:
-        name: pokerops.mongodb
+    - name: Deploy MongoDB
+      block:
+        - name: Include mongodb role
+          ansible.builtin.include_role:
+            name: pokerops.mongodb
+
+      always:
+        - name: Restore python interpreter
+          ansible.builtin.set_fact:
+            ansible_python_interpreter: "{{ _environment_python }}"
+
+        - name: Destroy virtualenv
+          ansible.builtin.file:
+            path: "{{ _virtualenv_tmpdir.path }}"
+            state: absent
+          changed_when: false
 
 - name: Deploy mongodb shard replicaset
   hosts: shard
   become: true
   vars:
     _format: "nephelaiio.plugins.map_format"
-    mongodb_addresses: "{{ play_hosts | map('extract', hostvars, ['ansible_default_ipv4', 'address']) }}"
+    mongodb_addresses: "{{ ansible_play_hosts | map('extract', hostvars, ['ansible_facts', 'default_ipv4', 'address']) }}"
     mongodb_members: "{{ mongodb_addresses | list }}"
     mongodb_replicaset_members: "{{ mongodb_members | map(_format, '%s:' + mongodb_port) | list }}"
     mongodb_replicaset_name: "{{ mongos_replicaset_shard_name }}"
@@ -97,10 +114,27 @@
         virtualenv: "{{ _virtualenv_tmpdir.path }}/venv"
       changed_when: false
 
+    - name: Record python interpreter
+      ansible.builtin.set_fact:
+        _environment_python: "{{ ansible_facts.python.executable }}"
+
     - name: Change python interpreter
       ansible.builtin.set_fact:
         ansible_python_interpreter: "{{ _virtualenv_tmpdir.path }}/venv/bin/python"
 
-    - name: Configure mongodb shard nodes
-      include_role:
-        name: pokerops.mongodb
+    - name: Deploy MongoDB
+      block:
+        - name: Configure mongodb shard nodes
+          ansible.builtin.include_role:
+            name: pokerops.mongodb
+
+      always:
+        - name: Restore python interpreter
+          ansible.builtin.set_fact:
+            ansible_python_interpreter: "{{ _environment_python }}"
+
+        - name: Destroy virtualenv
+          ansible.builtin.file:
+            path: "{{ _virtualenv_tmpdir.path }}"
+            state: absent
+          changed_when: false

@@ -8,7 +8,7 @@ driver:
   name: docker
 platforms:
   - name: mongos-install-mongos01
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -21,7 +21,7 @@ platforms:
     groups:
       - mongos
   - name: mongos-install-mongos02
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -34,7 +34,7 @@ platforms:
     groups:
       - mongos
   - name: mongos-install-config01
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -47,7 +47,7 @@ platforms:
     groups:
       - config
   - name: mongos-install-config02
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -60,7 +60,7 @@ platforms:
     groups:
       - config
   - name: mongos-install-config03
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -73,7 +73,7 @@ platforms:
     groups:
       - config
   - name: mongos-install-shard01
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -86,7 +86,7 @@ platforms:
     groups:
       - shard
   - name: mongos-install-shard02
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true
@@ -99,7 +99,7 @@ platforms:
     groups:
       - shard
   - name: mongos-install-shard03
-    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2004}-ansible:latest"
+    image: "geerlingguy/docker-${MOLECULE_DOCKER_IMAGE:-ubuntu2404}-ansible:latest"
     command: ${MOLECULE_DOCKER_COMMAND:-""}
     cgroupns_mode: host
     privileged: true

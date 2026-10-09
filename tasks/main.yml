@@ -3,13 +3,13 @@
   ansible.builtin.package:
     name: pkg-config
     state: present
-  when: ansible_os_family == "Debian"
+  when: ansible_facts.os_family == "Debian"
 
 - name: Install package prerequisites for RedHat systems
   ansible.builtin.package:
     name: yum-plugin-versionlock
     state: present
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
 
 - name: Install python prerequisites
   ansible.builtin.package:
@@ -37,7 +37,7 @@
         _lock_state: hold
 
 - name: Set systemd unit facts for Debian systems
-  when: ansible_os_family == 'Debian'
+  when: ansible_facts.os_family == 'Debian'
   block:
     - name: Query systemd service location
       ansible.builtin.command:
@@ -53,7 +53,7 @@
 - name: Set systemd unit facts for RedHat systems
   ansible.builtin.set_fact:
     mongos_systemd_unit_location: /etc/systemd/system
-  when: ansible_os_family == 'RedHat'
+  when: ansible_facts.os_family == 'RedHat'
 
 - name: Record mongos binary location
   ansible.builtin.command:
@@ -74,7 +74,7 @@
     group: root
     mode: "u=rw,go=r"
   vars:
-    _user: "{{ 'mongodb' if ansible_os_family == 'Debian' else 'mongod' }}"
+    _user: "{{ 'mongodb' if ansible_facts.os_family == 'Debian' else 'mongod' }}"
     _unit_exec_args: "--config {{ mongos_config_file }}"
     _unit_config:
       Unit:
