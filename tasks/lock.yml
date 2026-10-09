@@ -16,7 +16,7 @@
         _package_holds: "{{ _package_versions | select('string') }}"
         _package: "{{ item.split('=') | first }}"
       loop: "{{ _package_holds }}"
-      when: _package in ansible_facts.facts['packages']
+      when: _package in ansible_facts['packages']
       changed_when: false
 
 - name: Configure yum package locks
