@@ -1,4 +1,13 @@
-.devbox/
-.ansible/
+*.swp
+**/.ropeproject
+
 .molecule/
+.cache/
+.ansible/
+
 roles/
+
+.devbox/
+.venv/
+.vscode/
+.DS_Store

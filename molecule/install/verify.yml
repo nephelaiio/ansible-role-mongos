@@ -11,15 +11,17 @@
   tasks:
     - name: Check service state
       ansible.builtin.command: "systemctl status {{ mongos_service_name }}"
+      changed_when: false
 
     - name: Register and verify shard cluster
       run_once: true
+      tags: skip_ansible_lint
       block:
         - name: Register shard cluster
           ansible.builtin.set_fact:
             mongos_shard_cluster: "{{ _shard }}"
           vars:
-            _attrs: ["ansible_default_ipv4", "address"]
+            _attrs: ["ansible_facts", "default_ipv4", "address"]
             _hosts: "{{ groups['shard'] | map('extract', hostvars, _attrs) }}"
             _port: "27017"
             _members: "{{ _hosts | map('nephelaiio.plugins.map_format', '%s:' + _port) }}"
@@ -30,6 +32,7 @@
             db: "admin"
             eval: "db.runCommand({listShards: 1})"
           register: _shard_query
+          changed_when: false
 
         - name: Register shard cluster
           community.mongodb.mongodb_shell:
@@ -44,19 +47,23 @@
             db: "admin"
             eval: "db.runCommand({listShards: 1})"
           register: _shard_query
+          changed_when: false
 
         - name: Debug shard list
           ansible.builtin.debug:
-            msg: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list | join (',') }}"
+            msg: "{{ _output.shards | map(attribute='_id') | join (',') }}"
+          vars:
+            _output: "{{ _shard_query.transformed_output | default({}) }}"
 
         - name: Verify shard registration
           ansible.builtin.fail:
             msg: "Shard {{ mongos_replicaset_shard_name }} has not been registered"
           vars:
-            _shard_ids: "{{ _shard_query.transformed_output.shards | map(attribute='_id') | list }}"
+            _output: "{{ _shard_query.transformed_output | default({}) }}"
+            _shard_ids: "{{ _output.shards | map(attribute='_id') }}"
             _id_not_found: "{{ mongos_replicaset_shard_name not in _shard_ids }}"
-            _shard: "{{ _shard_query. }}"
-          when: _id_not_found
+          when: _id_not_found | bool
+          tags: skip_ansible_lint
 
         - name: Data load and sharding tests
           tags: data
@@ -119,7 +126,7 @@
                 msg: "Failed data size check; got {{ _data_size }}, expected {{ test_size }}"
               vars:
                 _data_size: "{{ _data_query.transformed_output | first }}"
-              when: _data_size != test_size
+              when: _data_size | int != test_size | int
 
             - name: Query shard status
               community.mongodb.mongodb_shell:

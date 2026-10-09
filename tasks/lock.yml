@@ -1,6 +1,6 @@
 ---
 - name: Manage debian package locks
-  when: ansible_os_family == "Debian"
+  when: ansible_facts.os_family == "Debian"
   block:
     - name: Query installed packages
       ansible.builtin.package_facts:
@@ -28,5 +28,5 @@
     _package_versions: "{{ [mongos_packages] | flatten | map('regex_search', _version_regex) }}"
     _package_holds: "{{ _package_versions | select('string') }}"
   loop: "{{ _package_holds }}"
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts.os_family == "RedHat"
   changed_when: false

@@ -1,0 +1,5 @@
+---
+roles:
+  - robertdebock.update
+  - nephelaiio.mongodb_repo
+  - pokerops.mongodb

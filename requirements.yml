@@ -1,8 +1,5 @@
 ---
-roles:
-  - robertdebock.update
-  - nephelaiio.mongodb_repo
-  - pokerops.mongodb
+roles: []
 collections:
   - community.general
   - community.mongodb
