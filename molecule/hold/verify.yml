@@ -68,7 +68,7 @@
     - name: Gather package facts
       ansible.builtin.package_facts:
 
-    - name: Verify package versions
+    - name: Verify debian package versions
       ansible.builtin.assert:
         that:
           - _package in packages
@@ -82,7 +82,7 @@
       loop: "{{ mongos_package_list }}"
       when: ansible_facts.os_family == "Debian"
 
-    - name: Verify package versions
+    - name: Verify redhat package versions
       ansible.builtin.assert:
         that:
           - _package in packages

@@ -51,7 +51,7 @@
 
         - name: Debug shard list
           ansible.builtin.debug:
-            msg: "{{ _output.shards | map(attribute='_id') | join (',') }}"
+            msg: "{{ _output.shards | map(attribute='_id') | join(',') }}"
           vars:
             _output: "{{ _shard_query.transformed_output | default({}) }}"
 
@@ -137,7 +137,7 @@
             - name: Set shard facts
               ansible.builtin.set_fact:
                 shards_dbs: "{{ _shard_dbs }}"
-                shards_data: "{{ _shard_dbs | selectattr('database._id', 'equalto', test_db) | list  }}"
+                shards_data: "{{ _shard_dbs | selectattr('database._id', 'equalto', test_db) | list }}"
               vars:
                 _shard_dbs: "{{ _status_query.transformed_output.value.databases }}"
 
